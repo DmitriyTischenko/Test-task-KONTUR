@@ -1,0 +1,59 @@
+services:
+  php:
+    build:
+      context: php
+      dockerfile: Dockerfile
+    container_name: kontur-php
+    volumes:
+      - ../:/var/www/html
+    working_dir: /var/www/html
+    user: "${UID}:${GID}"
+    networks:
+      - kontur_network
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      - mysql
+
+  nginx:
+    image: nginx:latest
+    container_name: kontur-nginx
+    ports:
+      - "8000:80"
+    volumes:
+      - ../:/var/www/html
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    networks:
+      - kontur_network
+    depends_on:
+      - php
+
+  mysql:
+    image: mysql:8.0
+    container_name: kontur-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: kontur
+      MYSQL_USER: kontur
+      MYSQL_PASSWORD: kontur
+    volumes:
+      - kontur_mysql_data:/var/lib/mysql
+    ports:
+      - "3307:3306"
+    networks:
+      - kontur_network
+
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: kontur-mailpit
+    ports:
+      - "8025:8025"
+      - "1025:1025"
+    networks:
+      - kontur_network
+
+volumes:
+  kontur_mysql_data:
+
+networks:
+  kontur_network:
