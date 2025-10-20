@@ -42,7 +42,7 @@ docker-compose up -d --build
 
 1.  Access the PHP container's shell:
     ```bash
-    docker exec -it robot-php bash
+    docker exec -it kontur-php bash
     ```
 
 2.  Inside the container, install PHP dependencies using Composer:
